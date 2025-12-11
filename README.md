@@ -1,169 +1,124 @@
-# 🛒 Monitor de Precios de MercadoLibre
+# 🛍️ Monitor de Precios MercadoLibre
 
-Un sistema automatizado de seguimiento y análisis de precios de productos en MercadoLibre, desarrollado con Python y Jupyter Notebooks.
+Sistema de seguimiento automático de precios de productos en MercadoLibre. Rastrea productos, detecta cambios de precio y genera análisis visual del histórico.
 
-## 📋 Descripción
+![Python](https://img.shields.io/badge/Python-3.8+-blue)
+![Status](https://img.shields.io/badge/Status-Active-success)
 
-Este proyecto permite:
-- 🔍 Buscar y rastrear productos de MercadoLibre
-- 💾 Almacenar histórico de precios
-- 📊 Visualizar evolución de precios en el tiempo
-- 🔔 Detectar cambios significativos de precio
-- 📈 Comparar precios entre vendedores
-- 🤖 Automatizar el monitoreo diario
+## ¿Qué hace?
 
-## 🚀 Características
+- Busca productos en MercadoLibre y guarda los precios
+- Actualiza precios automáticamente  
+- Te avisa cuando hay cambios importantes
+- Genera gráficos para ver cómo varían los precios
+- Recomienda cuándo es buen momento para comprar
 
-- **Web Scraping inteligente**: Extrae información de productos (precio, título, vendedor, etc.)
-- **Base de datos local**: SQLite para almacenar histórico
-- **Visualizaciones interactivas**: Gráficos con Plotly y Matplotlib
-- **Análisis estadístico**: Precio promedio, mínimo, máximo, tendencias
-- **Notebooks documentados**: Paso a paso con explicaciones
-- **Código modular**: Fácil de extender y mantener
+## Demo
 
-## 📁 Estructura del Proyecto
+<img src="output/price_evolution_0.png" width="600">
 
-```
-mercadolibre-price-monitor/
-│
-├── notebooks/              # Jupyter Notebooks
-│   ├── 01_setup_and_test.ipynb          # Configuración inicial
-│   ├── 02_scraping_basics.ipynb         # Fundamentos de scraping
-│   ├── 03_price_tracking.ipynb          # Sistema de tracking
-│   └── 04_data_analysis.ipynb           # Análisis y visualizaciones
-│
-├── src/                    # Código fuente Python
-│   ├── scraper.py         # Funciones de web scraping
-│   ├── database.py        # Manejo de base de datos
-│   ├── analyzer.py        # Análisis de datos
-│   └── utils.py           # Utilidades generales
-│
-├── data/                   # Datos y base de datos
-│   └── prices.db          # Base de datos SQLite
-│
-├── output/                 # Gráficos y reportes generados
-│
-├── docs/                   # Documentación adicional
-│
-├── requirements.txt        # Dependencias del proyecto
-└── README.md              # Este archivo
-```
+*Ejemplo: evolución del precio de un producto a lo largo del tiempo*
 
-## 🔧 Instalación
-
-### Requisitos previos
-- Python 3.8 o superior
-- pip (gestor de paquetes de Python)
-- Jupyter Notebook o JupyterLab
-
-### Pasos de instalación
-
-1. **Clonar o descargar el proyecto**
+## Instalación Rápida
 ```bash
+# Clonar proyecto
+git clone https://github.com/Vladimir-Bulan/mercadolibre-price-monitor.git
 cd mercadolibre-price-monitor
-```
 
-2. **Crear entorno virtual (recomendado)**
-```bash
-python -m venv venv
-
-# En Windows:
-venv\Scripts\activate
-
-# En Linux/Mac:
-source venv/bin/activate
-```
-
-3. **Instalar dependencias**
-```bash
+# Instalar dependencias
 pip install -r requirements.txt
-```
 
-4. **Iniciar Jupyter Notebook**
-```bash
+# Abrir notebooks
 jupyter notebook
 ```
 
-## 📚 Uso
+## Cómo usar
 
-### Opción 1: Notebooks interactivos (Recomendado para empezar)
+### Notebooks (recomendado)
 
-Abre los notebooks en orden:
+Los notebooks te guían paso a paso:
 
-1. **01_setup_and_test.ipynb**: Verifica que todo funcione
-2. **02_scraping_basics.ipynb**: Aprende los fundamentos
-3. **03_price_tracking.ipynb**: Rastrea productos
-4. **04_data_analysis.ipynb**: Analiza los datos
+1. `01_setup_and_test.ipynb` - Prueba que todo funcione
+2. `02_scraping_basics.ipynb` - Busca y guarda productos
+3. `03_price_tracking.ipynb` - Rastrea cambios de precio
+4. `04_data_analysis.ipynb` - Analiza y visualiza datos
 
-### Opción 2: Scripts Python
-
+### Código directo
 ```python
-from src.scraper import search_product, get_product_details
-from src.database import save_price, get_price_history
-from src.analyzer import plot_price_evolution
+from scraper import MercadoLibreScraper
+from database import PriceDatabase
 
-# Buscar un producto
-products = search_product("notebook lenovo")
+# Buscar productos
+scraper = MercadoLibreScraper()
+products = scraper.search_products("notebook lenovo", limit=10)
 
-# Obtener detalles
-details = get_product_details(products[0]['url'])
-
-# Guardar precio
-save_price(details)
-
-# Ver histórico
-history = get_price_history(details['id'])
-plot_price_evolution(history)
+# Guardar en base de datos
+db = PriceDatabase("data/prices.db")
+for product in products:
+    db.save_price(product)
 ```
 
-## 📊 Ejemplos de Análisis
+## Stack
 
-El proyecto incluye ejemplos de:
-- Evolución de precios en el tiempo
-- Comparación entre vendedores
-- Detección de mejores ofertas
-- Análisis estadístico de precios
-- Predicción de tendencias
+- **Python 3.13** - Lenguaje base
+- **BeautifulSoup** - Web scraping
+- **Pandas** - Análisis de datos
+- **Plotly/Matplotlib** - Gráficos
+- **SQLite** - Base de datos
 
-## ⚠️ Consideraciones Éticas y Legales
+## Estructura
+```
+mercadolibre-price-monitor/
+├── 01-04_*.ipynb          # Notebooks principales
+├── scraper.py             # Lógica de scraping
+├── database.py            # Manejo de BD
+├── analyzer.py            # Análisis y gráficos
+├── utils.py               # Utilidades
+├── output/                # Gráficos generados
+└── requirements.txt       # Dependencias
+```
 
-- Este proyecto es **exclusivamente educativo**
-- Respeta los términos de servicio de MercadoLibre
-- Implementa delays entre requests para no sobrecargar servidores
-- No está diseñado para uso comercial masivo
-- Usa los datos de forma responsable
+## Funcionalidades
 
-## 🛠️ Tecnologías Utilizadas
+**Scraping**
+- Búsqueda de productos por término
+- Extracción de precio, título, vendedor
+- Rate limiting para no saturar el servidor
 
-- **Python 3.x**: Lenguaje principal
-- **Jupyter Notebook**: Entorno interactivo
-- **Requests + BeautifulSoup**: Web scraping
-- **Pandas**: Manipulación de datos
-- **SQLite**: Base de datos
-- **Matplotlib/Plotly**: Visualizaciones
-- **Seaborn**: Gráficos estadísticos
+**Base de Datos**
+- Histórico completo de precios
+- Queries optimizadas
+- SQLite portable
 
-## 🔮 Mejoras Futuras
+**Análisis**
+- Precio min/max/promedio
+- Detección de cambios >5%
+- Scoring de oportunidad de compra (1-5 ⭐)
+- Comparación entre productos
 
-- [ ] Notificaciones por email/Telegram
-- [ ] Dashboard web con Streamlit/Flask
-- [ ] Machine Learning para predicción de precios
-- [ ] Soporte para múltiples sitios (Amazon, etc.)
-- [ ] API REST para consultar datos
-- [ ] Comparador de precios históricos
+**Visualización**
+- Gráficos de evolución temporal
+- Histogramas de distribución
+- Dashboard interactivo con Plotly
 
-## 📝 Licencia
+## Roadmap
 
-Este proyecto es de código abierto para fines educativos.
+- [x] Sistema base de scraping
+- [x] Base de datos y tracking
+- [x] Análisis y visualizaciones
+- [ ] Dashboard web (Streamlit)
+- [ ] Notificaciones automáticas
+- [ ] ML para predicción de precios
 
-## 👨‍💻 Autor
+## Nota Legal
 
-Proyecto desarrollado como ejemplo educativo de web scraping y análisis de datos con Python.
+Proyecto educativo. Respeta el `robots.txt` y términos de servicio de MercadoLibre. Incluye delays entre requests. Solo para uso personal/aprendizaje.
 
-## 🤝 Contribuciones
+## Autor
 
-Las sugerencias y mejoras son bienvenidas. Por favor, abre un issue o pull request.
+Vladimir Bulan  
+[GitHub](https://github.com/Vladimir-Bulan)
 
 ---
 
-⭐ Si te resulta útil este proyecto, no olvides darle una estrella!
+*Si te sirvió el proyecto, ⭐ dale una estrella!*
