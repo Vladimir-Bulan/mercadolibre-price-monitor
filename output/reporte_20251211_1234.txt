@@ -1,0 +1,44 @@
+
+======================================================================
+📊 REPORTE DE PRECIOS - MERCADOLIBRE
+======================================================================
+📅 Fecha: 11/12/2025 12:34
+📦 Total de productos: 7
+======================================================================
+
+1. Sin título
+   💰 Precio: $28.900
+   🏪 Vendedor: Desconocido
+   🔗 ID: 7
+
+2. Sin título
+   💰 Precio: $22.000
+   🏪 Vendedor: Desconocido
+   🔗 ID: 6
+
+3. Sin título
+   💰 Precio: $28.900
+   🏪 Vendedor: Desconocido
+   🔗 ID: 5
+
+4. Sin título
+   💰 Precio: $948.370
+   🏪 Vendedor: Desconocido
+   🔗 ID: 4
+
+5. Sin título
+   💰 Precio: $1.732.099
+   🏪 Vendedor: Desconocido
+   🔗 ID: 3
+
+6. Sin título
+   💰 Precio: $1.354.195
+   🏪 Vendedor: Desconocido
+   🔗 ID: 2
+
+7. Sin título
+   💰 Precio: $299.999
+   🏪 Vendedor: Desconocido
+   🔗 ID: 1
+
+======================================================================
