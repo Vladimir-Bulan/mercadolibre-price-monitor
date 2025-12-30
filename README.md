@@ -5,6 +5,8 @@
 ![Python](https://img.shields.io/badge/Python-3.13-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.52-red)
 ![Status](https://img.shields.io/badge/Status-Active-success)
+![Visitors](https://visitor-badge.laobi.icu/badge?page_id=Vladimir-Bulan.mercadolibre-price-monitor&left_color=gray&right_color=blue)
+
 
 ---
 
