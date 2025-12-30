@@ -15,32 +15,69 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ==================== ESTILOS CSS ====================
+# ==================== ESTILOS CSS MEJORADOS ====================
 st.markdown("""
 <style>
+    /* Gradiente principal */
     .main-header {
-        background: linear-gradient(90deg, #3483FA 0%, #FFE600 100%);
-        padding: 20px;
-        border-radius: 10px;
+        background: linear-gradient(135deg, #3483FA 0%, #FFE600 100%);
+        padding: 25px;
+        border-radius: 15px;
         margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
+    
+    /* Cards de métricas mejoradas */
     .metric-card {
-        background-color: #f0f2f6;
-        padding: 15px;
-        border-radius: 10px;
-        border-left: 4px solid #3483FA;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        padding: 20px;
+        border-radius: 15px;
+        border-left: 5px solid #3483FA;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
     }
+    
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+    
+    /* Cards de productos mejoradas */
     .product-card {
-        background-color: white;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 10px;
-        border: 1px solid #e0e0e0;
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-bottom: 15px;
+        border: 2px solid #f0f0f0;
+        transition: all 0.3s ease;
     }
+    
     .product-card:hover {
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(52, 131, 250, 0.2);
         border-color: #3483FA;
+    }
+    
+    /* Animación de alertas */
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.8; }
+        100% { opacity: 1; }
+    }
+    
+    .alert-badge {
+        animation: pulse 2s infinite;
+    }
+    
+    /* Botones mejorados */
+    .stButton > button {
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .stButton > button:hover {
+        transform: scale(1.05);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -57,7 +94,7 @@ def init_db():
 scraper = init_scraper()
 db = init_db()
 
-# Inicializar session_state para mantener los resultados de búsqueda
+# Inicializar session_state
 if 'search_results' not in st.session_state:
     st.session_state.search_results = []
 if 'last_search_query' not in st.session_state:
@@ -74,7 +111,6 @@ with st.sidebar:
     
     st.markdown("---")
     
-    # Info del proyecto
     st.markdown("### 📌 Sobre el Proyecto")
     st.markdown("""
     Sistema de monitoreo de precios para MercadoLibre.
@@ -93,13 +129,15 @@ with st.sidebar:
 if page == "🏠 Dashboard":
     st.title("🏠 Dashboard Principal")
     
-    # AGREGAR ESTO 👇
     # Verificar alertas de precio
-    threshold = 15  # Porcentaje de caída para alertar
+    threshold = 15
     alerts = db.check_price_alerts(threshold_percent=threshold)
     
     if alerts:
+        st.markdown('<div class="alert-badge">', unsafe_allow_html=True)
         st.warning(f"🔔 **{len(alerts)} Alerta(s) de Precio**")
+        st.markdown('</div>', unsafe_allow_html=True)
+        
         for alert in alerts:
             col1, col2 = st.columns([3, 1])
             with col1:
@@ -108,8 +146,6 @@ if page == "🏠 Dashboard":
             with col2:
                 st.metric("📉 Bajó", f"{alert['drop_percent']:.1f}%", delta=f"-${alert['previous_price'] - alert['current_price']:,.0f}")
         st.markdown("---")
-    # FIN DE LO QUE AGREGÁS 👆
-    
     
     # Obtener productos trackeados
     products = db.get_all_products()
@@ -126,7 +162,6 @@ if page == "🏠 Dashboard":
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col2:
-            # Calcular precio promedio desde el historial de cada producto
             total_price = 0
             count = 0
             for p in products:
@@ -141,7 +176,7 @@ if page == "🏠 Dashboard":
         
         with col3:
             st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.metric("📊 Actualizaciones Hoy", "🔄")
+            st.metric("🔔 Alertas", len(alerts))
             st.markdown('</div>', unsafe_allow_html=True)
         
         with col4:
@@ -167,16 +202,26 @@ if page == "🏠 Dashboard":
                         st.markdown(f"[🔗 Ver en MercadoLibre]({product['url']})")
                 
                 with col2:
-                    # Obtener precio actual desde el historial
                     hist = db.get_price_history(product['id'])
                     current_price = hist[-1]['price'] if hist else 0
                     st.metric("💰 Precio Actual", f"${current_price:,.0f}")
                 
                 with col3:
                     if st.button("🔄 Actualizar", key=f"update_{product['id']}"):
-                        with st.spinner("Actualizando..."):
-                            # Aquí iría la lógica de actualización
-                            st.success("✅ Actualizado!")
+                        with st.spinner("🔍 Actualizando precio..."):
+                            try:
+                                results = scraper.search_products(product['title'][:50], limit=1)
+                                
+                                if results and len(results) > 0:
+                                    updated_product = results[0]
+                                    updated_product['id'] = product['id']
+                                    db.save_price(updated_product)
+                                    st.success(f"✅ Precio actualizado: ${updated_product['price']:,.0f}")
+                                    st.rerun()
+                                else:
+                                    st.warning("⚠️ No se pudo actualizar el precio")
+                            except Exception as e:
+                                st.error(f"❌ Error: {str(e)}")
                     
                     if st.button("📈 Ver Gráfico", key=f"graph_{product['id']}"):
                         st.session_state[f'show_graph_{product["id"]}'] = True
@@ -213,7 +258,6 @@ if page == "🏠 Dashboard":
 elif page == "🔍 Buscar Productos":
     st.title("🔍 Buscar y Agregar Productos")
     
-    # Formulario de búsqueda
     col1, col2 = st.columns([4, 1])
     
     with col1:
@@ -226,7 +270,6 @@ elif page == "🔍 Buscar Productos":
     with col2:
         limit = st.number_input("Resultados", min_value=1, max_value=20, value=10)
     
-    # Botón de búsqueda
     if st.button("🔎 Buscar", use_container_width=True):
         if search_query:
             with st.spinner(f"🔍 Buscando '{search_query}' en MercadoLibre..."):
@@ -234,29 +277,24 @@ elif page == "🔍 Buscar Productos":
                     results = scraper.search_products(search_query, limit=limit)
                     
                     if results:
-                        # Guardar resultados en session_state
                         st.session_state.search_results = results
                         st.session_state.last_search_query = search_query
                         st.success(f"✅ Se encontraron {len(results)} productos")
                     else:
                         st.session_state.search_results = []
                         st.warning("⚠️ No se encontraron productos con ese término de búsqueda.")
-                        st.info("💡 Intenta con otro término de búsqueda.")
                         
                 except Exception as e:
                     st.error(f"❌ Error al buscar productos: {str(e)}")
-                    st.info("💡 Verifica tu conexión a internet e intenta nuevamente.")
         else:
             st.warning("⚠️ Por favor ingresá un término de búsqueda.")
     
-    # Mostrar resultados guardados en session_state
     if st.session_state.search_results:
         results = st.session_state.search_results
         
         st.markdown(f"### 📦 {len(results)} Productos Encontrados")
         st.caption(f"Búsqueda: **{st.session_state.last_search_query}**")
         
-        # Mostrar resultados en grid (2 columnas)
         for i in range(0, len(results), 2):
             cols = st.columns(2)
             
@@ -268,18 +306,14 @@ elif page == "🔍 Buscar Productos":
                         with st.container():
                             st.markdown('<div class="product-card">', unsafe_allow_html=True)
                             
-                            # Mostrar imagen si está disponible
                             if product.get('thumbnail'):
                                 st.image(product['thumbnail'], use_container_width=True)
                             
-                            # Título
                             st.markdown(f"**{product.get('title', 'Sin título')}**")
                             
-                            # Precio grande y destacado
                             price = product.get('price', 0)
                             st.markdown(f"<h2 style='color: #3483FA; margin: 10px 0;'>${price:,.0f}</h2>", unsafe_allow_html=True)
                             
-                            # Info adicional
                             col_info1, col_info2 = st.columns(2)
                             with col_info1:
                                 st.caption(f"🏪 {product.get('seller', 'Desconocido')}")
@@ -289,7 +323,6 @@ elif page == "🔍 Buscar Productos":
                                 else:
                                     st.caption("📦 Con envío")
                             
-                            # Botones
                             col_btn1, col_btn2 = st.columns(2)
                             
                             with col_btn1:
@@ -297,7 +330,6 @@ elif page == "🔍 Buscar Productos":
                                     st.link_button("🔗 Ver", product['url'], use_container_width=True)
                             
                             with col_btn2:
-                                # Clave única para cada botón usando el índice y el ID del producto
                                 unique_key = f"add_{product.get('id', '')}_{i}_{j}"
                                 if st.button("➕ Agregar", key=unique_key, use_container_width=True):
                                     try:
@@ -318,29 +350,21 @@ elif page == "📊 Análisis":
     if not products:
         st.info("No hay productos para analizar. Agregá algunos primero en **🔍 Buscar Productos**.")
     else:
-        # Selector de producto
         product_titles = [p['title'] for p in products]
         selected_product = st.selectbox("Seleccioná un producto:", product_titles)
         
-        # Encontrar el producto seleccionado
         product = next(p for p in products if p['title'] == selected_product)
-        
-        # Obtener historial de precios
         history = db.get_price_history(product['id'])
         
         if history and len(history) > 0:
             try:
                 df = pd.DataFrame(history)
                 
-                # Verificar que tenga las columnas necesarias
                 if 'scraped_at' not in df.columns or 'price' not in df.columns:
-                    st.error("⚠️ El formato de datos no es correcto. Intenta actualizar el precio del producto.")
+                    st.error("⚠️ El formato de datos no es correcto.")
                     st.stop()
                 
-                # Convertir scraped_at a datetime de manera segura
                 df['scraped_at'] = pd.to_datetime(df['scraped_at'], errors='coerce')
-                
-                # Eliminar filas con timestamps inválidos
                 df = df.dropna(subset=['scraped_at'])
                 
                 if len(df) == 0:
@@ -349,10 +373,8 @@ elif page == "📊 Análisis":
                     
             except Exception as e:
                 st.error(f"⚠️ Error al procesar los datos: {str(e)}")
-                st.info("💡 Intenta actualizar el precio del producto o agregalo nuevamente.")
                 st.stop()
             
-            # Estadísticas
             col1, col2, col3, col4 = st.columns(4)
             
             with col1:
@@ -373,7 +395,6 @@ elif page == "📊 Análisis":
             
             st.markdown("---")
             
-            # Gráfico de evolución
             st.subheader("📈 Evolución de Precio")
             
             fig = px.line(
@@ -388,7 +409,6 @@ elif page == "📊 Análisis":
             
             st.plotly_chart(fig, use_container_width=True)
             
-            # Distribución de precios
             st.subheader("📊 Distribución de Precios")
             
             fig2 = px.histogram(
@@ -403,18 +423,16 @@ elif page == "📊 Análisis":
             
             st.plotly_chart(fig2, use_container_width=True)
             
-            # Recomendación - CORREGIDO AQUÍ ✅
             current = product.get('current_price', product.get('price', df['price'].iloc[-1]))
             if current <= min_price * 1.05:
-                st.success("⭐⭐⭐⭐⭐ ¡Excelente momento para comprar! El precio está muy cerca del mínimo histórico.")
+                st.success("⭐⭐⭐⭐⭐ ¡Excelente momento para comprar!")
             elif current <= avg_price * 0.95:
-                st.info("⭐⭐⭐⭐ Buen momento para comprar. El precio está por debajo del promedio.")
+                st.info("⭐⭐⭐⭐ Buen momento para comprar.")
             elif current <= avg_price * 1.05:
-                st.warning("⭐⭐⭐ Precio normal. Podés esperar a una mejor oferta.")
+                st.warning("⭐⭐⭐ Precio normal.")
             else:
-                st.error("⭐⭐ Precio alto. Te recomendamos esperar a que baje.")
+                st.error("⭐⭐ Precio alto.")
             
-            # Exportar datos
             st.markdown("---")
             st.subheader("💾 Exportar Datos")
             
@@ -464,17 +482,35 @@ elif page == "⚙️ Configuración":
     
     st.subheader("🔄 Actualización de Precios")
     
-    if st.button("🔄 Actualizar Todos los Precios"):
+    if st.button("🔄 Actualizar Todos los Precios", use_container_width=True):
         products = db.get_all_products()
         
         if products:
+            st.info(f"🔍 Actualizando {len(products)} productos...")
             progress = st.progress(0)
+            status = st.empty()
+            
+            updated_count = 0
             
             for i, product in enumerate(products):
-                # Aquí iría la lógica de actualización real
+                status.text(f"Actualizando: {product['title'][:40]}...")
+                
+                try:
+                    results = scraper.search_products(product['title'][:50], limit=1)
+                    
+                    if results and len(results) > 0:
+                        updated_product = results[0]
+                        updated_product['id'] = product['id']
+                        db.save_price(updated_product)
+                        updated_count += 1
+                except:
+                    pass
+                
                 progress.progress((i + 1) / len(products))
             
-            st.success(f"✅ {len(products)} productos actualizados correctamente!")
+            status.empty()
+            progress.empty()
+            st.success(f"✅ {updated_count} de {len(products)} productos actualizados correctamente!")
         else:
             st.warning("No hay productos para actualizar.")
     
@@ -495,7 +531,7 @@ elif page == "⚙️ Configuración":
     st.subheader("🔗 Links Útiles")
     
     st.markdown("""
-    - [📖 Repositorio GitHub](https://github.com/tuusuario/mercadolibre-price-monitor)
-    - [🐛 Reportar Bug](https://github.com/tuusuario/mercadolibre-price-monitor/issues)
-    - [💡 Sugerir Feature](https://github.com/tuusuario/mercadolibre-price-monitor/discussions)
+    - [📖 Repositorio GitHub](https://github.com/Vladimir-Bulan/mercadolibre-price-monitor)
+    - [🐛 Reportar Bug](https://github.com/Vladimir-Bulan/mercadolibre-price-monitor/issues)
+    - [💡 Sugerir Feature](https://github.com/Vladimir-Bulan/mercadolibre-price-monitor/discussions)
     """)
