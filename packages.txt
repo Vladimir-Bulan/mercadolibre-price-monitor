@@ -1,0 +1,2 @@
+# No se necesitan paquetes del sistema
+# El scraper usa requests/beautifulsoup
