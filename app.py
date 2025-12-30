@@ -93,6 +93,24 @@ with st.sidebar:
 if page == "🏠 Dashboard":
     st.title("🏠 Dashboard Principal")
     
+    # AGREGAR ESTO 👇
+    # Verificar alertas de precio
+    threshold = 15  # Porcentaje de caída para alertar
+    alerts = db.check_price_alerts(threshold_percent=threshold)
+    
+    if alerts:
+        st.warning(f"🔔 **{len(alerts)} Alerta(s) de Precio**")
+        for alert in alerts:
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.markdown(f"**{alert['title'][:60]}...**")
+                st.caption(f"Precio anterior: ${alert['previous_price']:,.0f} → Ahora: ${alert['current_price']:,.0f}")
+            with col2:
+                st.metric("📉 Bajó", f"{alert['drop_percent']:.1f}%", delta=f"-${alert['previous_price'] - alert['current_price']:,.0f}")
+        st.markdown("---")
+    # FIN DE LO QUE AGREGÁS 👆
+    
+    
     # Obtener productos trackeados
     products = db.get_all_products()
     

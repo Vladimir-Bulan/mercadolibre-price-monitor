@@ -93,7 +93,7 @@ class PriceDatabase:
                 """, (
                     product['id'],
                     product['title'],
-                    product.get('link', '')
+                    product.get('link', product.get('url', ''))
                 ))
                 
                 conn.commit()
@@ -150,7 +150,7 @@ class PriceDatabase:
         """
         try:
             with sqlite3.connect(self.db_path) as conn:
-                conn.row_factory = sqlite3.Row  # Para obtener diccionarios
+                conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
                 
                 cursor.execute("""
@@ -189,7 +189,7 @@ class PriceDatabase:
                     SELECT 
                         p.id,
                         p.title,
-                        p.link,
+                        p.link as url,
                         p.first_seen,
                         COUNT(pr.id) as price_count,
                         MIN(pr.price) as min_price,
@@ -330,6 +330,38 @@ class PriceDatabase:
         except Exception as e:
             print(f"Error obteniendo estadísticas: {e}")
             return {}
+    
+    def check_price_alerts(self, threshold_percent=15):
+        """
+        Detecta productos con caída de precio significativa
+        threshold_percent: porcentaje mínimo de caída para alertar
+        """
+        alerts = []
+        products = self.get_all_products()
+        
+        for product in products:
+            history = self.get_price_history(product['id'])
+            
+            if len(history) >= 2:
+                # Precio actual vs precio anterior
+                current_price = history[-1]['price']
+                previous_price = history[-2]['price']
+                
+                # Calcular porcentaje de caída
+                if previous_price > 0:
+                    price_drop = ((previous_price - current_price) / previous_price) * 100
+                    
+                    if price_drop >= threshold_percent:
+                        alerts.append({
+                            'product_id': product['id'],
+                            'title': product['title'],
+                            'previous_price': previous_price,
+                            'current_price': current_price,
+                            'drop_percent': price_drop,
+                            'url': product.get('url', '')
+                        })
+        
+        return alerts
 
 
 # Funciones helper para facilitar el uso
