@@ -1093,5 +1093,6 @@ elif page == "Settings":
     
     st.markdown("""
     - [Documentation](https://github.com/Vladimir-Bulan/mercadolibre-price-monitor)
-   
+    - [Report Issue](https://github.com/Vladimir-Bulan/mercadolibre-price-monitor/issues)
+    - [Request Feature](https://github.com/Vladimir-Bulan/mercadolibre-price-monitor/discussions)
     """)
