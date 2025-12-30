@@ -9,75 +9,239 @@ from database import PriceDatabase
 
 # ==================== CONFIGURACIÓN DE LA PÁGINA ====================
 st.set_page_config(
-    page_title="Monitor de Precios MercadoLibre",
-    page_icon="🛍️",
+    page_title="MercadoLibre Price Monitor",
+    page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ==================== ESTILOS CSS MEJORADOS ====================
+# ==================== ESTILOS CSS PROFESIONALES ====================
 st.markdown("""
 <style>
-    /* Gradiente principal */
-    .main-header {
-        background: linear-gradient(135deg, #3483FA 0%, #FFE600 100%);
-        padding: 25px;
-        border-radius: 15px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    /* Imports */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    /* Variables */
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --secondary: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --dark: #1f2937;
+        --light: #f9fafb;
+        --border: #e5e7eb;
     }
     
-    /* Cards de métricas mejoradas */
+    /* Global */
+    * {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    }
+    
+    [data-testid="stSidebar"] * {
+        color: #f1f5f9 !important;
+    }
+    
+    /* Header profesional */
+    .pro-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .pro-header h1 {
+        color: white;
+        font-weight: 700;
+        font-size: 2rem;
+        margin: 0;
+        letter-spacing: -0.025em;
+    }
+    
+    .pro-header p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        margin: 0.5rem 0 0 0;
+        font-weight: 400;
+    }
+    
+    /* Metric Cards */
     .metric-card {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        padding: 20px;
-        border-radius: 15px;
-        border-left: 5px solid #3483FA;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        transition: all 0.3s ease;
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
     }
     
     .metric-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary);
     }
     
-    /* Cards de productos mejoradas */
+    .metric-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dark);
+        line-height: 1;
+    }
+    
+    /* Product Cards */
     .product-card {
         background: white;
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        margin-bottom: 15px;
-        border: 2px solid #f0f0f0;
-        transition: all 0.3s ease;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
     }
     
     .product-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(52, 131, 250, 0.2);
-        border-color: #3483FA;
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary);
     }
     
-    /* Animación de alertas */
-    @keyframes pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.8; }
-        100% { opacity: 1; }
+    .product-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
     }
     
+    .product-meta {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 1rem;
+    }
+    
+    .price-tag {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin: 1rem 0;
+    }
+    
+    /* Alert Badge */
     .alert-badge {
-        animation: pulse 2s infinite;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 1px solid #fbbf24;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        animation: subtle-pulse 3s ease-in-out infinite;
     }
     
-    /* Botones mejorados */
+    @keyframes subtle-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.95; }
+    }
+    
+    .alert-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #92400e;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Buttons */
     .stButton > button {
-        border-radius: 10px;
-        transition: all 0.3s ease;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.625rem 1.25rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     }
     
     .stButton > button:hover {
-        transform: scale(1.05);
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Badge */
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .badge-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .badge-warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .badge-info {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    /* Divider */
+    hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 2rem 0;
+    }
+    
+    /* Section Title */
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.025em;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* Link */
+    a {
+        color: var(--primary);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    
+    a:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -102,92 +266,110 @@ if 'last_search_query' not in st.session_state:
 
 # ==================== SIDEBAR ====================
 with st.sidebar:
-    st.markdown('<div class="main-header"><h1 style="color: white; margin: 0;">🛍️ MercadoLibre</h1><p style="color: white; margin: 0;">Monitor de Precios</p></div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="pro-header">
+        <h1>MercadoLibre</h1>
+        <p>Price Monitor Pro</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     page = st.radio(
-        "Navegación",
-        ["🏠 Dashboard", "🔍 Buscar Productos", "📊 Análisis", "⚙️ Configuración"]
+        "Navigation",
+        ["Dashboard", "Search Products", "Analytics", "Settings"],
+        label_visibility="collapsed"
     )
     
     st.markdown("---")
     
-    st.markdown("### 📌 Sobre el Proyecto")
+    st.markdown("### About")
     st.markdown("""
-    Sistema de monitoreo de precios para MercadoLibre.
+    Professional price monitoring system for MercadoLibre.
     
     **Features:**
-    - 🔍 Búsqueda de productos
-    - 💰 Seguimiento de precios
-    - 📈 Análisis de tendencias
-    - 🎯 Alertas personalizadas
+    - Real-time product tracking
+    - Price history analysis
+    - Automated alerts
+    - Data export
     """)
     
     st.markdown("---")
-    st.markdown("Hecho con ❤️ usando Streamlit")
+    st.caption("Built with Streamlit • v1.0.0")
 
 # ==================== DASHBOARD ====================
-if page == "🏠 Dashboard":
-    st.title("🏠 Dashboard Principal")
+if page == "Dashboard":
+    st.markdown('<h1 class="section-title">Dashboard</h1>', unsafe_allow_html=True)
     
-    # Verificar alertas de precio
+    # Verificar alertas
     threshold = 15
     alerts = db.check_price_alerts(threshold_percent=threshold)
     
     if alerts:
-        st.markdown('<div class="alert-badge">', unsafe_allow_html=True)
-        st.warning(f"🔔 **{len(alerts)} Alerta(s) de Precio**")
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="alert-badge">
+            <div class="alert-title">⚠ {len(alerts)} Price Alert(s)</div>
+            <p style="margin: 0; color: #92400e;">Significant price drops detected</p>
+        </div>
+        """, unsafe_allow_html=True)
         
         for alert in alerts:
             col1, col2 = st.columns([3, 1])
             with col1:
                 st.markdown(f"**{alert['title'][:60]}...**")
-                st.caption(f"Precio anterior: ${alert['previous_price']:,.0f} → Ahora: ${alert['current_price']:,.0f}")
+                st.caption(f"Previous: ${alert['previous_price']:,.0f} → Current: ${alert['current_price']:,.0f}")
             with col2:
-                st.metric("📉 Bajó", f"{alert['drop_percent']:.1f}%", delta=f"-${alert['previous_price'] - alert['current_price']:,.0f}")
+                st.metric("Price Drop", f"{alert['drop_percent']:.1f}%", 
+                         delta=f"-${alert['previous_price'] - alert['current_price']:,.0f}")
         st.markdown("---")
     
-    # Obtener productos trackeados
+    # Obtener productos
     products = db.get_all_products()
     
     if not products:
-        st.info("👋 ¡Bienvenido! Aún no tenés productos en seguimiento. Andá a **🔍 Buscar Productos** para agregar algunos.")
+        st.info("👋 Welcome! No products tracked yet. Go to Search Products to add some.")
     else:
         # Métricas principales
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.metric("📦 Productos", len(products))
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown(f"""
+            <div class="metric-card">
+                <div class="metric-label">Products</div>
+                <div class="metric-value">{len(products)}</div>
+            </div>
+            """, unsafe_allow_html=True)
         
         with col2:
-            total_price = 0
-            count = 0
-            for p in products:
-                hist = db.get_price_history(p['id'])
-                if hist:
-                    total_price += hist[-1]['price']
-                    count += 1
+            total_price = sum(db.get_price_history(p['id'])[-1]['price'] 
+                            for p in products if db.get_price_history(p['id']))
+            count = len([p for p in products if db.get_price_history(p['id'])])
             avg_price = total_price / count if count > 0 else 0
-            st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.metric("💰 Precio Promedio", f"${avg_price:,.0f}")
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown(f"""
+            <div class="metric-card">
+                <div class="metric-label">Avg Price</div>
+                <div class="metric-value">${avg_price:,.0f}</div>
+            </div>
+            """, unsafe_allow_html=True)
         
         with col3:
-            st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.metric("🔔 Alertas", len(alerts))
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown(f"""
+            <div class="metric-card">
+                <div class="metric-label">Active Alerts</div>
+                <div class="metric-value">{len(alerts)}</div>
+            </div>
+            """, unsafe_allow_html=True)
         
         with col4:
-            st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-            st.metric("⭐ Estado", "✅ Activo")
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown("""
+            <div class="metric-card">
+                <div class="metric-label">Status</div>
+                <div class="metric-value" style="color: #10b981;">Active</div>
+            </div>
+            """, unsafe_allow_html=True)
         
-        st.markdown("---")
+        st.markdown("<hr>", unsafe_allow_html=True)
         
-        # Mostrar productos
-        st.subheader("📦 Productos en Seguimiento")
+        # Productos
+        st.markdown('<h2 class="section-title">Tracked Products</h2>', unsafe_allow_html=True)
         
         for product in products:
             with st.container():
@@ -196,38 +378,40 @@ if page == "🏠 Dashboard":
                 col1, col2, col3 = st.columns([3, 1, 1])
                 
                 with col1:
-                    st.markdown(f"### {product.get('title', 'Sin título')}")
-                    st.caption(f"🏪 {product.get('seller', 'Desconocido')}")
+                    st.markdown(f'<div class="product-title">{product.get("title", "Untitled")}</div>', 
+                               unsafe_allow_html=True)
+                    st.markdown(f'<div class="product-meta">Seller: {product.get("seller", "Unknown")}</div>', 
+                               unsafe_allow_html=True)
                     if product.get('url'):
-                        st.markdown(f"[🔗 Ver en MercadoLibre]({product['url']})")
+                        st.markdown(f"[View on MercadoLibre →]({product['url']})")
                 
                 with col2:
                     hist = db.get_price_history(product['id'])
                     current_price = hist[-1]['price'] if hist else 0
-                    st.metric("💰 Precio Actual", f"${current_price:,.0f}")
+                    st.markdown(f'<div class="price-tag">${current_price:,.0f}</div>', 
+                               unsafe_allow_html=True)
                 
                 with col3:
-                    if st.button("🔄 Actualizar", key=f"update_{product['id']}"):
-                        with st.spinner("🔍 Actualizando precio..."):
+                    if st.button("Update", key=f"update_{product['id']}", use_container_width=True):
+                        with st.spinner("Updating..."):
                             try:
                                 results = scraper.search_products(product['title'][:50], limit=1)
-                                
                                 if results and len(results) > 0:
                                     updated_product = results[0]
                                     updated_product['id'] = product['id']
                                     db.save_price(updated_product)
-                                    st.success(f"✅ Precio actualizado: ${updated_product['price']:,.0f}")
+                                    st.success(f"Updated: ${updated_product['price']:,.0f}")
                                     st.rerun()
                                 else:
-                                    st.warning("⚠️ No se pudo actualizar el precio")
+                                    st.warning("Could not update")
                             except Exception as e:
-                                st.error(f"❌ Error: {str(e)}")
+                                st.error(f"Error: {str(e)}")
                     
-                    if st.button("📈 Ver Gráfico", key=f"graph_{product['id']}"):
+                    if st.button("Chart", key=f"graph_{product['id']}", use_container_width=True):
                         st.session_state[f'show_graph_{product["id"]}'] = True
                         st.rerun()
                 
-                # Mostrar gráfico si se solicitó
+                # Mostrar gráfico
                 if st.session_state.get(f'show_graph_{product["id"]}', False):
                     history = db.get_price_history(product['id'])
                     
@@ -239,61 +423,86 @@ if page == "🏠 Dashboard":
                             df,
                             x='scraped_at',
                             y='price',
-                            title=f"Evolución de Precio - {product.get('title', 'Producto')}",
-                            labels={'scraped_at': 'Fecha', 'price': 'Precio (ARS)'}
+                            title=f"Price Evolution - {product.get('title', 'Product')}",
+                            labels={'scraped_at': 'Date', 'price': 'Price (ARS)'}
                         )
-                        fig.update_traces(line_color='#3483FA', line_width=3)
-                        fig.update_layout(hovermode='x unified')
+                        fig.update_traces(
+                            line_color='#2563eb', 
+                            line_width=3,
+                            mode='lines+markers',
+                            marker=dict(size=6)
+                        )
+                        fig.update_layout(
+                            hovermode='x unified',
+                            height=350,
+                            font=dict(family='Inter, sans-serif'),
+                            plot_bgcolor='white',
+                            paper_bgcolor='white',
+                            xaxis=dict(
+                                showgrid=True,
+                                gridcolor='#f0f0f0',
+                                showline=True,
+                                linecolor='#e5e7eb'
+                            ),
+                            yaxis=dict(
+                                showgrid=True,
+                                gridcolor='#f0f0f0',
+                                showline=True,
+                                linecolor='#e5e7eb'
+                            ),
+                            margin=dict(l=60, r=20, t=60, b=60)
+                        )
                         
-                        st.plotly_chart(fig, use_container_width=True)
+                        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
                         
-                        if st.button("❌ Cerrar Gráfico", key=f"close_{product['id']}"):
+                        if st.button("Close", key=f"close_{product['id']}"):
                             st.session_state[f'show_graph_{product["id"]}'] = False
                             st.rerun()
                 
                 st.markdown('</div>', unsafe_allow_html=True)
-                st.markdown("---")
 
 # ==================== BUSCAR PRODUCTOS ====================
-elif page == "🔍 Buscar Productos":
-    st.title("🔍 Buscar y Agregar Productos")
+elif page == "Search Products":
+    st.markdown('<h1 class="section-title">Search Products</h1>', unsafe_allow_html=True)
     
     col1, col2 = st.columns([4, 1])
     
     with col1:
         search_query = st.text_input(
-            "¿Qué producto querés buscar?",
-            placeholder="Ej: notebook lenovo, iphone 13, zapatillas nike...",
-            value=st.session_state.last_search_query
+            "Search",
+            placeholder="e.g. lenovo notebook, iphone 13...",
+            value=st.session_state.last_search_query,
+            label_visibility="collapsed"
         )
     
     with col2:
-        limit = st.number_input("Resultados", min_value=1, max_value=20, value=10)
+        limit = st.number_input("Results", min_value=1, max_value=20, value=10)
     
-    if st.button("🔎 Buscar", use_container_width=True):
+    if st.button("Search", use_container_width=True, type="primary"):
         if search_query:
-            with st.spinner(f"🔍 Buscando '{search_query}' en MercadoLibre..."):
+            with st.spinner(f"Searching '{search_query}'..."):
                 try:
                     results = scraper.search_products(search_query, limit=limit)
                     
                     if results:
                         st.session_state.search_results = results
                         st.session_state.last_search_query = search_query
-                        st.success(f"✅ Se encontraron {len(results)} productos")
+                        st.success(f"Found {len(results)} products")
                     else:
                         st.session_state.search_results = []
-                        st.warning("⚠️ No se encontraron productos con ese término de búsqueda.")
+                        st.warning("No products found")
                         
                 except Exception as e:
-                    st.error(f"❌ Error al buscar productos: {str(e)}")
+                    st.error(f"Error: {str(e)}")
         else:
-            st.warning("⚠️ Por favor ingresá un término de búsqueda.")
+            st.warning("Please enter a search term")
     
     if st.session_state.search_results:
         results = st.session_state.search_results
         
-        st.markdown(f"### 📦 {len(results)} Productos Encontrados")
-        st.caption(f"Búsqueda: **{st.session_state.last_search_query}**")
+        st.markdown(f'<h2 class="section-title">{len(results)} Products Found</h2>', 
+                   unsafe_allow_html=True)
+        st.caption(f"Search: **{st.session_state.last_search_query}**")
         
         for i in range(0, len(results), 2):
             cols = st.columns(2)
@@ -309,32 +518,36 @@ elif page == "🔍 Buscar Productos":
                             if product.get('thumbnail'):
                                 st.image(product['thumbnail'], use_container_width=True)
                             
-                            st.markdown(f"**{product.get('title', 'Sin título')}**")
+                            st.markdown(f'<div class="product-title">{product.get("title", "Untitled")}</div>', 
+                                       unsafe_allow_html=True)
                             
                             price = product.get('price', 0)
-                            st.markdown(f"<h2 style='color: #3483FA; margin: 10px 0;'>${price:,.0f}</h2>", unsafe_allow_html=True)
+                            st.markdown(f'<div class="price-tag">${price:,.0f}</div>', 
+                                       unsafe_allow_html=True)
                             
                             col_info1, col_info2 = st.columns(2)
                             with col_info1:
-                                st.caption(f"🏪 {product.get('seller', 'Desconocido')}")
+                                st.markdown(f'<span class="badge badge-info">{product.get("seller", "Unknown")}</span>', 
+                                           unsafe_allow_html=True)
                             with col_info2:
                                 if product.get('free_shipping'):
-                                    st.caption("🚚 Envío gratis")
-                                else:
-                                    st.caption("📦 Con envío")
+                                    st.markdown('<span class="badge badge-success">Free Shipping</span>', 
+                                               unsafe_allow_html=True)
+                            
+                            st.markdown("<br>", unsafe_allow_html=True)
                             
                             col_btn1, col_btn2 = st.columns(2)
                             
                             with col_btn1:
                                 if product.get('url'):
-                                    st.link_button("🔗 Ver", product['url'], use_container_width=True)
+                                    st.link_button("View", product['url'], use_container_width=True)
                             
                             with col_btn2:
                                 unique_key = f"add_{product.get('id', '')}_{i}_{j}"
-                                if st.button("➕ Agregar", key=unique_key, use_container_width=True):
+                                if st.button("Track", key=unique_key, use_container_width=True):
                                     try:
                                         db.save_price(product)
-                                        st.success("✅ Agregado!")
+                                        st.success("Added!")
                                         st.balloons()
                                     except Exception as e:
                                         st.error(f"Error: {str(e)}")
@@ -342,16 +555,16 @@ elif page == "🔍 Buscar Productos":
                             st.markdown('</div>', unsafe_allow_html=True)
 
 # ==================== ANÁLISIS ====================
-elif page == "📊 Análisis":
-    st.title("📊 Análisis de Precios")
+elif page == "Analytics":
+    st.markdown('<h1 class="section-title">Analytics</h1>', unsafe_allow_html=True)
     
     products = db.get_all_products()
     
     if not products:
-        st.info("No hay productos para analizar. Agregá algunos primero en **🔍 Buscar Productos**.")
+        st.info("No products to analyze. Add some first.")
     else:
         product_titles = [p['title'] for p in products]
-        selected_product = st.selectbox("Seleccioná un producto:", product_titles)
+        selected_product = st.selectbox("Select Product", product_titles)
         
         product = next(p for p in products if p['title'] == selected_product)
         history = db.get_price_history(product['id'])
@@ -359,141 +572,188 @@ elif page == "📊 Análisis":
         if history and len(history) > 0:
             try:
                 df = pd.DataFrame(history)
-                
-                if 'scraped_at' not in df.columns or 'price' not in df.columns:
-                    st.error("⚠️ El formato de datos no es correcto.")
-                    st.stop()
-                
                 df['scraped_at'] = pd.to_datetime(df['scraped_at'], errors='coerce')
                 df = df.dropna(subset=['scraped_at'])
                 
                 if len(df) == 0:
-                    st.warning("⚠️ No hay datos válidos para mostrar.")
+                    st.warning("No valid data")
                     st.stop()
                     
             except Exception as e:
-                st.error(f"⚠️ Error al procesar los datos: {str(e)}")
+                st.error(f"Error: {str(e)}")
                 st.stop()
             
+            # Stats
             col1, col2, col3, col4 = st.columns(4)
             
-            with col1:
-                current_price = df['price'].iloc[-1]
-                st.metric("💰 Precio Actual", f"${current_price:,.0f}")
+            stats = [
+                ("Current", df['price'].iloc[-1]),
+                ("Minimum", df['price'].min()),
+                ("Maximum", df['price'].max()),
+                ("Average", df['price'].mean())
+            ]
             
-            with col2:
-                min_price = df['price'].min()
-                st.metric("📉 Precio Mínimo", f"${min_price:,.0f}")
+            for col, (label, value) in zip([col1, col2, col3, col4], stats):
+                with col:
+                    col.markdown(f"""
+                    <div class="metric-card">
+                        <div class="metric-label">{label}</div>
+                        <div class="metric-value">${value:,.0f}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
             
-            with col3:
-                max_price = df['price'].max()
-                st.metric("📈 Precio Máximo", f"${max_price:,.0f}")
+            st.markdown("<hr>", unsafe_allow_html=True)
             
-            with col4:
-                avg_price = df['price'].mean()
-                st.metric("📊 Precio Promedio", f"${avg_price:,.0f}")
-            
-            st.markdown("---")
-            
-            st.subheader("📈 Evolución de Precio")
+            # Gráfico
+            st.markdown('<h2 class="section-title">Price Evolution</h2>', unsafe_allow_html=True)
             
             fig = px.line(
                 df,
                 x='scraped_at',
                 y='price',
-                title=f"Historial de Precios - {product['title']}",
-                labels={'scraped_at': 'Fecha', 'price': 'Precio (ARS)'}
+                title="",
+                labels={'scraped_at': 'Date', 'price': 'Price (ARS)'}
             )
-            fig.update_traces(line_color='#3483FA', line_width=3)
-            fig.update_layout(hovermode='x unified', height=400)
+            fig.update_traces(
+                line_color='#2563eb', 
+                line_width=3,
+                mode='lines+markers',
+                marker=dict(size=6)
+            )
+            fig.update_layout(
+                hovermode='x unified',
+                height=400,
+                font=dict(family='Inter, sans-serif'),
+                plot_bgcolor='white',
+                paper_bgcolor='white',
+                xaxis=dict(
+                    showgrid=True,
+                    gridcolor='#f0f0f0',
+                    showline=True,
+                    linecolor='#e5e7eb'
+                ),
+                yaxis=dict(
+                    showgrid=True,
+                    gridcolor='#f0f0f0',
+                    showline=True,
+                    linecolor='#e5e7eb'
+                ),
+                margin=dict(l=60, r=20, t=20, b=60)
+            )
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
             
-            st.subheader("📊 Distribución de Precios")
+            # Distribution
+            st.markdown('<h2 class="section-title">Price Distribution</h2>', unsafe_allow_html=True)
             
             fig2 = px.histogram(
                 df,
                 x='price',
                 nbins=20,
-                title="Frecuencia de Precios",
-                labels={'price': 'Precio (ARS)', 'count': 'Frecuencia'}
+                title="",
+                labels={'price': 'Price (ARS)', 'count': 'Frequency'}
             )
-            fig2.update_traces(marker_color='#3483FA')
-            fig2.update_layout(height=300)
+            fig2.update_traces(marker_color='#2563eb', marker_line_color='#1e40af', marker_line_width=1)
+            fig2.update_layout(
+                height=300,
+                font=dict(family='Inter, sans-serif'),
+                plot_bgcolor='white',
+                paper_bgcolor='white',
+                xaxis=dict(
+                    showgrid=True,
+                    gridcolor='#f0f0f0',
+                    showline=True,
+                    linecolor='#e5e7eb'
+                ),
+                yaxis=dict(
+                    showgrid=True,
+                    gridcolor='#f0f0f0',
+                    showline=True,
+                    linecolor='#e5e7eb'
+                ),
+                margin=dict(l=60, r=20, t=20, b=60),
+                bargap=0.1
+            )
             
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2, use_container_width=True, config={'displayModeBar': False})
             
-            current = product.get('current_price', product.get('price', df['price'].iloc[-1]))
+            # Recommendation
+            current = df['price'].iloc[-1]
+            min_price = df['price'].min()
+            avg_price = df['price'].mean()
+            
             if current <= min_price * 1.05:
-                st.success("⭐⭐⭐⭐⭐ ¡Excelente momento para comprar!")
+                st.success("★★★★★ Excellent time to buy! Price near historical minimum.")
             elif current <= avg_price * 0.95:
-                st.info("⭐⭐⭐⭐ Buen momento para comprar.")
+                st.info("★★★★ Good time to buy. Price below average.")
             elif current <= avg_price * 1.05:
-                st.warning("⭐⭐⭐ Precio normal.")
+                st.warning("★★★ Normal price. You can wait for a better offer.")
             else:
-                st.error("⭐⭐ Precio alto.")
+                st.error("★★ High price. We recommend waiting.")
             
-            st.markdown("---")
-            st.subheader("💾 Exportar Datos")
+            # Export
+            st.markdown("<hr>", unsafe_allow_html=True)
+            st.markdown('<h2 class="section-title">Export Data</h2>', unsafe_allow_html=True)
             
             col1, col2 = st.columns(2)
             
             with col1:
                 csv = df.to_csv(index=False)
                 st.download_button(
-                    label="📥 Descargar CSV",
+                    label="Download CSV",
                     data=csv,
-                    file_name=f"precios_{product['id']}.csv",
-                    mime="text/csv"
+                    file_name=f"prices_{product['id']}.csv",
+                    mime="text/csv",
+                    use_container_width=True
                 )
             
             with col2:
                 json_data = df.to_json(orient='records', indent=2)
                 st.download_button(
-                    label="📥 Descargar JSON",
+                    label="Download JSON",
                     data=json_data,
-                    file_name=f"precios_{product['id']}.json",
-                    mime="application/json"
+                    file_name=f"prices_{product['id']}.json",
+                    mime="application/json",
+                    use_container_width=True
                 )
         else:
-            st.info("No hay suficiente historial de precios para analizar.")
+            st.info("Insufficient price history")
 
 # ==================== CONFIGURACIÓN ====================
-elif page == "⚙️ Configuración":
-    st.title("⚙️ Configuración")
+elif page == "Settings":
+    st.markdown('<h1 class="section-title">Settings</h1>', unsafe_allow_html=True)
     
-    st.subheader("🔔 Alertas de Precio")
+    st.markdown('<h2 class="section-title">Price Alerts</h2>', unsafe_allow_html=True)
     
-    enable_alerts = st.checkbox("Activar alertas de precio", value=True)
+    enable_alerts = st.checkbox("Enable price alerts", value=True)
     
     if enable_alerts:
         alert_threshold = st.slider(
-            "Porcentaje de caída para alertar:",
+            "Alert threshold (% drop):",
             min_value=5,
             max_value=50,
             value=15,
-            step=5,
-            help="Te notificaremos cuando un producto baje este porcentaje"
+            step=5
         )
         
-        st.info(f"✅ Te avisaremos cuando un producto baje un {alert_threshold}% o más")
+        st.info(f"You'll be notified when a product drops {alert_threshold}% or more")
     
-    st.markdown("---")
+    st.markdown("<hr>", unsafe_allow_html=True)
     
-    st.subheader("🔄 Actualización de Precios")
+    st.markdown('<h2 class="section-title">Bulk Update</h2>', unsafe_allow_html=True)
     
-    if st.button("🔄 Actualizar Todos los Precios", use_container_width=True):
+    if st.button("Update All Products", use_container_width=True, type="primary"):
         products = db.get_all_products()
         
         if products:
-            st.info(f"🔍 Actualizando {len(products)} productos...")
+            st.info(f"Updating {len(products)} products...")
             progress = st.progress(0)
             status = st.empty()
             
             updated_count = 0
             
             for i, product in enumerate(products):
-                status.text(f"Actualizando: {product['title'][:40]}...")
+                status.text(f"Updating: {product['title'][:40]}...")
                 
                 try:
                     results = scraper.search_products(product['title'][:50], limit=1)
@@ -510,28 +770,38 @@ elif page == "⚙️ Configuración":
             
             status.empty()
             progress.empty()
-            st.success(f"✅ {updated_count} de {len(products)} productos actualizados correctamente!")
+            st.success(f"✓ Updated {updated_count} of {len(products)} products")
         else:
-            st.warning("No hay productos para actualizar.")
+            st.warning("No products to update")
     
-    st.markdown("---")
+    st.markdown("<hr>", unsafe_allow_html=True)
     
-    st.subheader("ℹ️ Información del Sistema")
+    st.markdown('<h2 class="section-title">System Info</h2>', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.metric("📦 Productos Trackeados", len(db.get_all_products()))
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-label">Tracked Products</div>
+            <div class="metric-value">{len(db.get_all_products())}</div>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
-        st.metric("🗄️ Base de Datos", "SQLite")
+        st.markdown("""
+        <div class="metric-card">
+            <div class="metric-label">Database</div>
+            <div class="metric-value" style="font-size: 1.5rem;">SQLite</div>
+        </div>
+        """, unsafe_allow_html=True)
     
-    st.markdown("---")
+    st.markdown("<hr>", unsafe_allow_html=True)
     
-    st.subheader("🔗 Links Útiles")
+    st.markdown('<h2 class="section-title">Resources</h2>', unsafe_allow_html=True)
     
     st.markdown("""
-    - [📖 Repositorio GitHub](https://github.com/Vladimir-Bulan/mercadolibre-price-monitor)
-    - [🐛 Reportar Bug](https://github.com/Vladimir-Bulan/mercadolibre-price-monitor/issues)
-    - [💡 Sugerir Feature](https://github.com/Vladimir-Bulan/mercadolibre-price-monitor/discussions)
+    - [Documentation](https://github.com/Vladimir-Bulan/mercadolibre-price-monitor)
+    - [Report Issue](https://github.com/Vladimir-Bulan/mercadolibre-price-monitor/issues)
+    - [Request Feature](https://github.com/Vladimir-Bulan/mercadolibre-price-monitor/discussions)
     """)
